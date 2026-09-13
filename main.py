@@ -1,30 +1,19 @@
-import socket
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
-server_socket = socket.socket()
 
-server_socket.bind(("127.0.0.1", 8000))
+class MyHandler(BaseHTTPRequestHandler):
 
-server_socket.listen()
+    def do_GET(self):
+        self.send_response(200)
 
-print("Server is running at http://127.0.0.1:8000")
+        self.send_header("Content-Type", "text/html")
+        self.end_headers()
 
-connection, address = server_socket.accept()
+        self.wfile.write(b"<h1>Hello from my server!</h1>")
 
-print("Client connected:", address)
 
-data = connection.recv(1024)
+server = HTTPServer(("127.0.0.1", 8000), MyHandler)
 
-print("Request:")
-print(data.decode())
+print("Server running at http://127.0.0.1:8000")
 
-response = (
-    "HTTP/1.1 200 OK\r\n"
-    "Content-Type: text/html\r\n"
-    "\r\n"
-    "<h1>Hello, I am Akash!</h1>"
-)
-
-connection.send(response.encode())
-
-connection.close()
-server_socket.close()
+server.serve_forever()
