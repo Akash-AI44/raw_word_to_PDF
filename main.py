@@ -5,13 +5,17 @@ from pathlib import Path
 class MyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
+
         if self.path == "/":
-            with open("static/index.html", "rb") as file:
-                html = file.read()
+
+            file_path = Path("static") / "index.html"
+
+            html = file_path.read_bytes()
 
             self.send_response(200)
             self.send_header("Content-Type", "text/html")
             self.end_headers()
+
             self.wfile.write(html)
 
 
