@@ -1,6 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import mimetypes
+import json
 
 
 class MyHandler(BaseHTTPRequestHandler):
@@ -15,6 +16,9 @@ class MyHandler(BaseHTTPRequestHandler):
             filename = self.path[len("/static/"):]
             file_path = Path("static") / filename
             self.send_file(file_path)
+
+        elif self.path == "/health":
+            self.send_json(200, {"status": "ok"})
 
         else:
             self.send_error(404)
@@ -34,6 +38,14 @@ class MyHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         self.wfile.write(content)
+
+    def send_json(self, status_code, payload):
+        json_bytes = json.dumps(payload).encode()
+
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json_bytes)
 
 
 server = HTTPServer(("127.0.0.1", 8000), MyHandler)
