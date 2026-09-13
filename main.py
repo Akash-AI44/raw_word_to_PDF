@@ -1,5 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
+import mimetypes
 
 
 class MyHandler(BaseHTTPRequestHandler):
@@ -8,20 +9,17 @@ class MyHandler(BaseHTTPRequestHandler):
 
         if self.path == "/":
             file_path = Path("static/index.html")
-            self.send_file(file_path, "text/html")
+            self.send_file(file_path)
 
-        elif self.path == "/style.css":
-            file_path = Path("static/style.css")
-            self.send_file(file_path, "text/css")
-
-        elif self.path == "/script.js":
-            file_path = Path("static/script.js")
-            self.send_file(file_path, "application/javascript")
+        elif self.path.startswith("/static/"):
+            filename = self.path[len("/static/"):]
+            file_path = Path("static") / filename
+            self.send_file(file_path)
 
         else:
             self.send_error(404)
 
-    def send_file(self, file_path, content_type):
+    def send_file(self, file_path):
 
         if not file_path.exists():
             self.send_error(404)
@@ -30,7 +28,9 @@ class MyHandler(BaseHTTPRequestHandler):
         content = file_path.read_bytes()
 
         self.send_response(200)
-        self.send_header("Content-Type", content_type)
+        content_type, encoding = mimetypes.guess_type(str(file_path))
+        self.send_header(
+            "Content-Type", content_type or "application/octet-stream")
         self.end_headers()
 
         self.wfile.write(content)
