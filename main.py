@@ -7,18 +7,33 @@ class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
 
         if self.path == "/":
+            file_path = Path("static/index.html")
+            self.send_file(file_path, "text/html")
 
-            file_path = Path("static") / "index.html"
+        elif self.path == "/style.css":
+            file_path = Path("static/style.css")
+            self.send_file(file_path, "text/css")
 
-            html = file_path.read_bytes()
+        elif self.path == "/script.js":
+            file_path = Path("static/script.js")
+            self.send_file(file_path, "application/javascript")
 
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html")
-            self.end_headers()
-
-            self.wfile.write(html)
         else:
-            self.send_error(404, message="404 Not Found", explain=None)
+            self.send_error(404)
+
+    def send_file(self, file_path, content_type):
+
+        if not file_path.exists():
+            self.send_error(404)
+            return
+
+        content = file_path.read_bytes()
+
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.end_headers()
+
+        self.wfile.write(content)
 
 
 server = HTTPServer(("127.0.0.1", 8000), MyHandler)

@@ -1,0 +1,184 @@
+/*
+  * { box-sizing: border-box; }
+  এটা সব element এ apply হয় (* মানে "সব")।
+  box-sizing: border-box মানে হলো — কোনো element এর padding আর border
+  তার width/height এর ভেতরেই ধরা হবে, বাইরে বাড়বে না।
+  এটা না দিলে layout মাঝে মাঝে এলোমেলো হয়ে যায়, তাই প্রায় সব CSS ফাইলে
+  এই লাইনটা শুরুতেই থাকে।
+*/
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* পুরো body এর background color, font, এবং center-alignment ঠিক করছি */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    /* পুরো স্ক্রিনের height যতটুকু, ততটুকু নেবে */
+    display: flex;
+    /* flexbox দিয়ে child element কে center করব */
+    align-items: center;
+    /* উপর-নিচ মাঝখানে */
+    justify-content: center;
+    /* ডান-বাম মাঝখানে */
+    padding: 20px;
+}
+
+/* মূল সাদা card, যার ভেতরে সবকিছু আছে */
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    /* হালকা shadow, উঁচু মনে হবে */
+    text-align: center;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #2d3748;
+}
+
+.subtitle {
+    color: #718096;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+/* drag-and-drop এর জায়গা */
+.drop-zone {
+    border: 2px dashed #cbd5e0;
+    /* dashed = ড্যাশ ড্যাশ বর্ডার */
+    border-radius: 12px;
+    padding: 40px 20px;
+    cursor: pointer;
+    /* mouse hover করলে হাতের icon দেখাবে, বোঝাবে এটা clickable */
+    transition: all 0.2s ease;
+    /* color/border বদলানো smooth ভাবে হবে */
+    margin-bottom: 16px;
+}
+
+/* .drop-zone এর সাথে .drag-over class যোগ হলে (JS থেকে যোগ করব) এই স্টাইল হবে */
+.drop-zone.drag-over {
+    border-color: #667eea;
+    background: #f0f2ff;
+}
+
+.drop-zone:hover {
+    border-color: #a0aec0;
+}
+
+#dropZoneText {
+    color: #718096;
+    font-size: 14px;
+}
+
+.file-name {
+    font-size: 14px;
+    color: #2d3748;
+    font-weight: 600;
+    min-height: 20px;
+    /* ফাইল নাম না থাকলেও জায়গা রিজার্ভ থাকবে, layout না লাফায় */
+    margin-bottom: 16px;
+}
+
+/* Convert বাটন */
+button {
+    width: 100%;
+    padding: 14px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+    background: #5a67d8;
+}
+
+/* বাটন disabled থাকলে ধূসর দেখাবে, cursor "not-allowed" হবে */
+button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+/* Loading status area */
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+/* ঘুরন্ত spinner - CSS animation দিয়ে বানানো */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #667eea;
+    /* উপরের অংশ ভিন্ন রঙ দিলে ঘুরানোটা চোখে পড়ে */
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* spin নামের animation define করছি: 0% থেকে 360 ডিগ্রি ঘুরবে, বারবার */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.error {
+    color: #e53e3e;
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+/*
+  Download link কে দেখতে ঠিক আমাদের Convert বাটনের মতোই বানাচ্ছি,
+  কিন্তু সবুজ রঙে — যাতে বোঝা যায় এটা "সফল হয়েছে, এবার ডাউনলোড করুন" ধাপ।
+  <a> ট্যাগ ডিফল্টভাবে inline element (block না), তাই display: block +
+  width: 100% দিয়ে বাটনের মতো পুরো width জুড়ে দেখাচ্ছি।
+*/
+.download-link {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    background: #38a169;
+    /* সবুজ - সফল অবস্থা বোঝাতে */
+    color: white;
+    text-decoration: none;
+    /* <a> ট্যাগের ডিফল্ট আন্ডারলাইন সরিয়ে দিচ্ছি */
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    transition: background 0.2s ease;
+}
+
+.download-link:hover {
+    background: #2f855a;
+}
+
+/*
+  .hidden class যেকোনো element কে সম্পূর্ণ লুকিয়ে ফেলবে।
+  JS থেকে element.classList.add("hidden") / remove("hidden") করে
+  আমরা জিনিস দেখাবো-লুকাবো।
+*/
+.hidden {
+    display: none;
+}
