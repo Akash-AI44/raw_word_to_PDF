@@ -27,7 +27,10 @@ class MyHandler(BaseHTTPRequestHandler):
         if self.path == "/convert":
             length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(length)
-            print("Length of body:", len(body))
+            filename, file_bytes = parse_multipart(
+                body, self.headers.get("Content-Type", ""))
+            print("filename:", filename)
+            print("file size:", len(file_bytes))
 
     def send_file(self, file_path):
 
@@ -52,6 +55,22 @@ class MyHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.end_headers()
         self.wfile.write(json_bytes)
+
+
+def parse_multipart(body, content_type):
+    boundary = content_type.split("boundary=")[1]
+    boundary = boundary.encode()
+    parts = body.split(b"--" + boundary)
+
+    for part in parts:
+        if b'filename="' in part:
+            start = part.find(b'filename="') + len(b'filename="')
+            end = part.find(b'"', start)
+            filename = part[start:end].decode()
+            content_start = part.find(b"\r\n\r\n") + 4
+            file_bytes = part[content_start:-2]
+
+            return filename, file_bytes
 
 
 server = HTTPServer(("127.0.0.1", 8000), MyHandler)
