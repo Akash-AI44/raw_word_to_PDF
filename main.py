@@ -23,6 +23,12 @@ class MyHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(404)
 
+    def do_POST(self):
+        if self.path == "/convert":
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length)
+            print("Length of body:", len(body))
+
     def send_file(self, file_path):
 
         if not file_path.exists():
