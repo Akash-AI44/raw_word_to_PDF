@@ -2,6 +2,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 import mimetypes
 import json
+import tempfile
 
 
 class MyHandler(BaseHTTPRequestHandler):
@@ -29,8 +30,11 @@ class MyHandler(BaseHTTPRequestHandler):
             body = self.rfile.read(length)
             filename, file_bytes = parse_multipart(
                 body, self.headers.get("Content-Type", ""))
-            print("filename:", filename)
-            print("file size:", len(file_bytes))
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp_path = Path(tmp)
+                input_path = tmp_path / filename
+                input_path.write_bytes(file_bytes)
+                print("Saved to:", input_path)
 
     def send_file(self, file_path):
 
