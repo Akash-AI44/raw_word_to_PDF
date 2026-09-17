@@ -35,6 +35,21 @@ class MyHandler(BaseHTTPRequestHandler):
                 input_path = tmp_path / filename
                 input_path.write_bytes(file_bytes)
                 print("Saved to:", input_path)
+                pdf_path = tmp_path / (input_path.stem + ".pdf")
+                try:
+                    from docx2pdf import convert
+                except ImportError:
+                    self.send_json(500, {"error": "docx2pdf is not installed"})
+                    return
+
+                try:
+                    convert(str(input_path), str(pdf_path))
+                    self.send_file(pdf_path)
+                except Exception as exc:
+                    self.send_json(500, {"error": str(exc)})
+            return
+
+        self.send_error(404)
 
     def send_file(self, file_path):
 
